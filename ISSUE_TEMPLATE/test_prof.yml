@@ -1,0 +1,12 @@
+name: Optimize tests with TestProf
+description: TestProf AI refactoring
+title: "[TestProf] "
+labels: ["test-prof"]
+body:
+  - type: input
+    attributes:
+      label: "File path"
+      description: Which test file to optimize? Please, specify the project's relative path
+      placeholder: ex. spec/models/user_spec.rb
+    validations:
+      required: true

@@ -1,0 +1,55 @@
+name: 'TestProf AI refactoring'
+description: 'Optimize tests using TestProf'
+inputs:
+  api-key:
+    description: An API key to communicate with an LLM (Claude by default)
+    required: true
+  issue-number:
+    description: 'GitHub issue number to read the task from'
+    default: ''
+  test-file-path:
+    description: A relative path to the test file to refactor
+    default: ''
+  base-branch:
+    description: Base Git branch to open a PR against
+    default: 'main'
+  test-command:
+    description: How to execute a test file
+    default: 'bundle exec rspec'
+  example-patch-path:
+    description: Path to the example Git patch to use by AI
+    default: ''
+  custom-prompt-path:
+    description: 'Path to a custom prompt template to use'
+    default: ''
+
+runs:
+  using: 'composite'
+  steps:
+    - name: Set up custom prompt
+      if: ${{ inputs.custom-prompt-path != '' }}
+      shell: bash
+      run: |
+        echo "Using custom prompt from ${{ inputs.custom-prompt-path }}"
+        cp -f ${{ inputs.custom-prompt-path }} ${{ github.action_path }}/prompt.txt
+
+    - name: Set up custom example diff
+      if: ${{ inputs.example-patch-path != '' }}
+      shell: bash
+      run: |
+        echo "Using custom patch from ${{ inputs.example-patch-path }}"
+        cp -f ${{ inputs.example-patch-path }} ${{ github.action_path }}/patch.diff
+
+    - name: Execute AI script
+      shell: bash
+      env:
+        CLAUDE_API_KEY: ${{ inputs.api-key }}
+        GITHUB_ISSUE_NUMBER: ${{ inputs.issue-number }}
+        TEST_FILE_PATH: ${{ inputs.test-file-path }}
+        GITHUB_TOKEN: ${{ github.token }}
+        GITHUB_BASE_BRANCH: ${{ inputs.base-branch }}
+        PROMPT_PATH: ${{ github.action_path }}/prompt.txt
+        EXAMPLE_PATCH_PATH: ${{ github.action_path }}/patch.diff
+        TEST_COMMAND_PREFIX: ${{ inputs.test-command }}
+      run: |
+        ruby ${{ github.action_path }}/main.rb

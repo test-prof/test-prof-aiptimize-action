@@ -1,0 +1,118 @@
+diff --git a/spec/controllers/statuses_controller_spec.rb b/spec/controllers/statuses_controller_spec.rb
+index fe40ee6..122de41 100644
+--- a/spec/controllers/statuses_controller_spec.rb
++++ b/spec/controllers/statuses_controller_spec.rb
+@@ -2,13 +2,12 @@
+ 
+ require 'rails_helper'
+ 
+-describe StatusesController do
++describe StatusesController, :account do
+   render_views
+ 
+-  describe 'GET #show' do
+-    let(:account) { Fabricate(:account) }
+-    let(:status)  { Fabricate(:status, account: account) }
++  let_it_be(:status)  { Fabricate(:status, account: account) }
+ 
++  describe 'GET #show' do
+     context 'when account is permanently suspended' do
+       before do
+         account.suspend!
+@@ -89,7 +88,7 @@ describe StatusesController do
+     end
+ 
+     context 'when status is private' do
+-      let(:status) { Fabricate(:status, account: account, visibility: :private) }
++      before { status.update!(visibility: :private) }
+ 
+       before do
+         get :show, params: { account_username: status.account.username, id: status.id, format: format }
+@@ -113,7 +112,7 @@ describe StatusesController do
+     end
+ 
+     context 'when status is direct' do
+-      let(:status) { Fabricate(:status, account: account, visibility: :direct) }
++      before { status.update!(visibility: :direct) }
+ 
+       before do
+         get :show, params: { account_username: status.account.username, id: status.id, format: format }
+@@ -136,9 +135,7 @@ describe StatusesController do
+       end
+     end
+ 
+-    context 'when signed-in' do
+-      let(:user) { Fabricate(:user) }
+-
++    context 'when signed-in', :user do
+       before do
+         sign_in(user)
+       end
+@@ -194,7 +191,7 @@ describe StatusesController do
+       end
+ 
+       context 'when status is private' do
+-        let(:status) { Fabricate(:status, account: account, visibility: :private) }
++        before { status.update!(visibility: :private) }
+ 
+         context 'when user is authorized to see it' do
+           before do
+@@ -261,7 +258,7 @@ describe StatusesController do
+       end
+ 
+       context 'when status is direct' do
+-        let(:status) { Fabricate(:status, account: account, visibility: :direct) }
++        before { status.update!(visibility: :direct) }
+ 
+         context 'when user is authorized to see it' do
+           before do
+@@ -328,7 +325,7 @@ describe StatusesController do
+     end
+ 
+     context 'with signature' do
+-      let(:remote_account) { Fabricate(:account, domain: 'example.com') }
++      let_it_be(:remote_account) { Fabricate(:account, domain: 'example.com') }
+ 
+       before do
+         allow(controller).to receive(:signed_request_actor).and_return(remote_account)
+@@ -397,7 +394,7 @@ describe StatusesController do
+       end
+ 
+       context 'when status is private' do
+-        let(:status) { Fabricate(:status, account: account, visibility: :private) }
++        before { status.update!(visibility: :private) }
+ 
+         context 'when user is authorized to see it' do
+           before do
+@@ -464,7 +461,7 @@ describe StatusesController do
+       end
+ 
+       context 'when status is direct' do
+-        let(:status) { Fabricate(:status, account: account, visibility: :direct) }
++        before { status.update!(visibility: :direct) }
+ 
+         context 'when user is authorized to see it' do
+           before do
+@@ -531,9 +528,8 @@ describe StatusesController do
+     end
+   end
+ 
+-  describe 'GET #activity' do
+-    let(:account) { Fabricate(:account) }
+-    let(:status)  { Fabricate(:status, account: account) }
++  describe 'GET #activity', :account do
++    let_it_be(:status)  { Fabricate(:status, account: account) }
+ 
+     context 'when account is permanently suspended' do
+       before do
+@@ -593,9 +589,7 @@ describe StatusesController do
+       end
+     end
+ 
+-    context 'when signed-in' do
+-      let(:user) { Fabricate(:user) }
+-
++    context 'when signed-in', :user do
+       before do
+         sign_in(user)
+       end
