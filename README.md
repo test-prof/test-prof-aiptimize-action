@@ -1,5 +1,7 @@
 # TestProf AI GitHub Action
 
+> 📖 Read also the ["Dev tools AI‑fication 101: lessons from Martian robots" blog post](https://evilmartians.com/chronicles/dev-tools-ai-fication-101-lessons-from-martian-robots).
+
 This GitHub Action allows you to optimize Rails tests via [TestProf][] and [Claude AI][Claude].
 
 The action performs the given test file profiling and refactors it to speed up the execution (using `let_it_be` and `before_all` helpers from TestProf). It opens a PR and shares the refactoring progress as it executes.
